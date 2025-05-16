@@ -1,0 +1,22 @@
+networks:
+  fairino-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.58.0/24
+          gateway: 192.168.58.1
+
+services:
+  fairino-container:
+    container_name: fairino-container
+    image: fairino_simmachine:latest
+    privileged: true
+    networks:
+      - fairino-net
+    command: /bin/bash -c "
+      sed -i -e 's/102/401/g' /usr/local/etc/controller/user.config
+      && sed -i -e 's/5/20/g' /usr/local/etc/robot/RobotType.txt
+      && sed -i -e 's/2/5/g' /usr/local/etc/robot/RobotType.txt
+      && /etc/init.d/frinit.sh start
+      && while true; do echo 'running'; sleep 10; done"
